@@ -1,0 +1,25 @@
+name: Check Hardware Capability
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Choose a runner'
+        required: true
+        default: 'ubuntu-latest'
+        type: choice
+        options:
+          - ubuntu-latest
+          - ubuntu-24.04
+          - ubuntu-22.04
+          - ubuntu-20.04
+
+jobs:
+  check:
+    runs-on: ["${{ inputs.runner }}"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Check hardware
+        run: |
+          chmod +x ./scripts/hardware_check.sh
+          ./scripts/hardware_check.sh
