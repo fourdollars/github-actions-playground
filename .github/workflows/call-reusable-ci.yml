@@ -1,0 +1,19 @@
+name: Call Reusable CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  staging:
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      environment: "${{vars.NAME}}"
+    secrets:
+      environment: "${{secrets.NAME}}"
+  production:
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      environment: "${{vars.NAME}}"
+    secrets:
+      environment: "${{secrets.NAME}}"
+    needs: staging
