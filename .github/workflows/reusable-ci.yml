@@ -1,0 +1,17 @@
+name: Reusable CI Workflow
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'The environement to run the tests on'
+        required: true
+        type: string
+        default: 'stagaing'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: echo "$${inputs.environment}"
