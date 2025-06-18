@@ -1,0 +1,22 @@
+name: Check Environment
+on:
+  workflow_dispatch:
+
+jobs:
+  staging:
+    runs-on: [ubuntu-latest]
+    environment: staging
+    steps:
+      - name: Check
+        run: |
+          echo "${{secrets.NAME}}"
+          echo "${{vars.NAME}}"
+  production:
+    needs: staging
+    runs-on: [ubuntu-latest]
+    environment: production
+    steps:
+      - name: Check
+        run: |
+          echo "${{secrets.NAME}}"
+          echo "${{vars.NAME}}"
