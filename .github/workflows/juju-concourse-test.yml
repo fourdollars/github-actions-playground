@@ -12,9 +12,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install and init LXD
+        run: |
+          sudo snap install lxd
+          sudo lxd init --auto
+          sudo usermod -a -G lxd $USER
       - name: Install Juju
         run: |
-          sudo snap install juju --classic
+          sudo snap install juju
           sudo snap install juju-wait --classic
       - name: Bootstrap Juju
         run: sudo juju bootstrap localhost --config test-mode=true --config automatically-retry-hooks=false
