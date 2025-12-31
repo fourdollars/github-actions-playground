@@ -35,3 +35,45 @@ jobs:
 
       - name: Wait for model to settle
         run: sudo juju-wait -m concourse-ci -t 900
+
+      - name: Juju Status
+        run: sudo juju status
+
+      - name: Get admin password
+        run: sudo juju run concourse-ci/leader get-admin-password | grep password: | awk '{print $2}' > admin-password.txt
+
+      - name: Get Concourse IP
+        run: sudo juju status | grep "concourse-ci/" | awk '{print $5}' > concourse-ip.txt
+
+      - name: Install fly CLI
+        run: |
+          curl -Lo fly "http://$(cat concourse-ip.txt):8080/api/v1/cli?arch=amd64&platform=linux"
+          chmod +x ./fly
+          sudo mv ./fly /usr/local/bin/
+
+      - name: Create pipeline
+        run: |
+          cat <<EOF > pipeline.yml
+          jobs:
+          - name: hello-world
+            plan:
+            - task: say-hello
+              config:
+                platform: linux
+                image_resource:
+                  type: registry-image
+                  source:
+                    repository: busybox
+                run:
+                  path: echo
+                  args: ["Hello, world!"]
+          EOF
+
+      - name: Deploy and trigger pipeline
+        run: |
+          export CONCOURSE_URL=$(cat concourse-ip.txt)
+          export CONCOURSE_PASSWORD=$(cat admin-password.txt)
+          fly -t ci login -c http://$CONCOURSE_URL:8080 -u admin -p $CONCOURSE_PASSWORD
+          fly -t ci set-pipeline -p hello-world -c pipeline.yml -n
+          fly -t ci trigger-job -j hello-world/hello-world
+          fly -t ci builds
