@@ -12,20 +12,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install and init LXD
-        run: |
-          sudo snap install lxd
-          sudo lxd init --auto
-          sudo usermod -a -G lxd $USER
-      - name: Configure LXD mirror
-        run: |
-          cat <<EOF | sudo lxc profile edit default
-          config:
-            cloud-init.user-data: |
-              #cloud-config
-              apt_mirror: http://azure.archive.ubuntu.com/ubuntu/
-              package_update: true
-          EOF
+      - name: Setup LXD
+        uses: canonical/setup-lxd@v1
+        with:
+          channel: 5.21/stable
       - name: Install Juju
         run: |
           sudo snap install juju
