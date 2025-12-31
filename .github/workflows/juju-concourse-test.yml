@@ -53,35 +53,28 @@ jobs:
           chmod +x ./fly
           sudo mv ./fly /usr/local/bin/
 
-      - name: Create pipeline
+      - name: Create task
         run: |
-          cat <<EOF > pipeline.yml
-          jobs:
-          - name: hello-world
-            plan:
-            - task: say-hello
-              config:
-                platform: linux
-                image_resource:
-                  type: registry-image
-                  source:
-                    repository: busybox
-                run:
-                  path: echo
-                  args: ["Hello, world!"]
+          cat <<EOF > task.yml
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: busybox
+          run:
+            path: echo
+            args: ["Hello, world!"]
           EOF
 
       - name: Install yq
         run: sudo snap install yq
 
-      - name: Validate pipeline YAML
-        run: yq e . pipeline.yml > /dev/null
+      - name: Validate task YAML
+        run: yq e . task.yml > /dev/null
 
-      - name: Deploy and trigger pipeline
+      - name: Execute task
         run: |
           export CONCOURSE_URL=$(cat concourse-ip.txt)
           export CONCOURSE_PASSWORD=$(cat admin-password.txt)
           fly -t ci login -c http://$CONCOURSE_URL:8080 -u admin -p $CONCOURSE_PASSWORD
-          fly -t ci set-pipeline -p hello-world -c pipeline.yml -n
-          fly -t ci trigger-job -j hello-world/hello-world
-          fly -t ci builds
+          fly -t ci execute -c task.yml
