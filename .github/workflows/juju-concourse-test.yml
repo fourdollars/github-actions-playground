@@ -23,15 +23,15 @@ jobs:
           config:
             cloud-init.user-data: |
               #cloud-config
-              apt:
-                mirror: http://azure.archive.ubuntu.com/ubuntu/
+              apt_mirror: http://azure.archive.ubuntu.com/ubuntu/
+              package_update: true
           EOF
       - name: Install Juju
         run: |
           sudo snap install juju
           sudo snap install juju-wait --classic
       - name: Bootstrap Juju
-        run: for i in $(seq 1 5); do sudo juju bootstrap localhost --config test-mode=true && break; sleep 10; done
+        run: sudo juju bootstrap localhost --config test-mode=true
 
       - name: Deploy charm
         run: sudo juju deploy concourse-ci-machine --channel edge --config deployment-mode=all
