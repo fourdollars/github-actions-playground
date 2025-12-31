@@ -16,6 +16,12 @@ jobs:
         uses: canonical/setup-lxd@v1
         with:
           channel: 5.21/stable
+      - name: Wait for LXD
+        run: |
+          while ! ip link show lxdbr0; do
+            echo "Waiting for lxdbr0..."
+            sleep 10
+          done
       - name: Install Juju
         run: |
           sudo snap install juju
