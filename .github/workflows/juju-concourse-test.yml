@@ -34,4 +34,4 @@ jobs:
         run: sudo juju relate concourse-ci:postgresql postgresql:database
 
       - name: Wait for model to settle
-        run: sudo juju-wait -m concourse-ci --for=settled --timeout=15m
+        run: sudo juju-wait -m concourse-ci -t 900
