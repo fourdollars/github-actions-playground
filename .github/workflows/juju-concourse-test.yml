@@ -17,6 +17,15 @@ jobs:
           sudo snap install lxd
           sudo lxd init --auto
           sudo usermod -a -G lxd $USER
+      - name: Configure LXD mirror
+        run: |
+          cat <<EOF | sudo lxc profile edit default
+          config:
+            cloud-init.user-data: |
+              #cloud-config
+              apt:
+                mirror: http://azure.archive.ubuntu.com/ubuntu/
+          EOF
       - name: Install Juju
         run: |
           sudo snap install juju
