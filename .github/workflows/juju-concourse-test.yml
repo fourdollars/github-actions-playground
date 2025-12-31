@@ -40,10 +40,12 @@ jobs:
         run: sudo juju status
 
       - name: Get admin password
-        run: sudo juju run concourse-ci/leader get-admin-password | grep password: | awk '{print $2}' > admin-password.txt
+        run: |
+          sudo juju run concourse-ci/leader get-admin-password | grep "password:" | awk '{print $2}' > admin-password.txt
 
       - name: Get Concourse IP
-        run: sudo juju status | grep "concourse-ci/" | awk '{print $5}' > concourse-ip.txt
+        run: |
+          sudo juju status | grep "concourse-ci/" | awk '{print $5}' > concourse-ip.txt
 
       - name: Install fly CLI
         run: |
@@ -68,6 +70,12 @@ jobs:
                   path: echo
                   args: ["Hello, world!"]
           EOF
+
+      - name: Install yq
+        run: sudo snap install yq
+
+      - name: Validate pipeline YAML
+        run: yq e . pipeline.yml > /dev/null
 
       - name: Deploy and trigger pipeline
         run: |
