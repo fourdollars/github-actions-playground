@@ -22,7 +22,7 @@ jobs:
           sudo snap install juju
           sudo snap install juju-wait --classic
       - name: Bootstrap Juju
-        run: sudo juju bootstrap localhost --config test-mode=true --config automatically-retry-hooks=false
+        run: for i in $(seq 1 5); do sudo juju bootstrap localhost --config test-mode=true && break; sleep 10; done
 
       - name: Deploy charm
         run: sudo juju deploy concourse-ci-machine --channel edge --config deployment-mode=all
