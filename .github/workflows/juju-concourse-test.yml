@@ -22,30 +22,30 @@ jobs:
           sudo snap install juju
           sudo snap install juju-wait --classic
       - name: Bootstrap Juju
-        run: sudo juju bootstrap localhost --config test-mode=true
+        run: juju bootstrap localhost --config test-mode=true
       - name: Add Juju Model
-        run: sudo juju add-model concourse-ci
+        run: juju add-model concourse-ci
 
       - name: Deploy charms
         run: |
-          sudo juju deploy concourse-ci-machine concourse-ci --channel edge --config deployment-mode=all
-          sudo juju deploy postgresql --channel 16/stable
+          juju deploy concourse-ci-machine concourse-ci --channel edge --config deployment-mode=all
+          juju deploy postgresql --channel 16/stable
       - name: Relate charms
-        run: sudo juju relate concourse-ci:postgresql postgresql:database
+        run: juju relate concourse-ci:postgresql postgresql:database
 
       - name: Wait for model to settle
-        run: sudo juju-wait -m concourse-ci -t 900
+        run: juju-wait -m concourse-ci -t 900
 
       - name: Juju Status
-        run: sudo juju status
+        run: juju status
 
       - name: Get admin password
         run: |
-          sudo juju run concourse-ci/leader get-admin-password | grep "password:" | awk '{print $2}' > admin-password.txt
+          juju run concourse-ci/leader get-admin-password | grep "password:" | awk '{print $2}' > admin-password.txt
 
       - name: Get Concourse IP
         run: |
-          sudo juju status | grep "concourse-ci/" | awk '{print $5}' > concourse-ip.txt
+          juju status | grep "concourse-ci/" | awk '{print $5}' > concourse-ip.txt
 
       - name: Install fly CLI
         run: |
